@@ -300,16 +300,12 @@ input[type="number"] {
 }
 
 .btn-num {
-    border: 1px solid #ced4da;
-    background-color: white;
-    border-radius: 4px; /* Un poco menos redondeado */
-    
-    /* CAMBIOS PRINCIPALES DE TAMAÑO */
-    padding: 8px 0;   /* Antes 15px (Reducción ~45%) */
-    font-size: 1rem;  /* Antes 1.25rem (Reducción ~20%) */
-    
-    font-weight: 500;
-    touch-action: manipulation;
+   height: 48px; /* Altura fija para que todas las filas midan igual */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .btn-num:active {
@@ -325,7 +321,7 @@ input[type="number"] {
 .btn-num.action-enter {
     background-color: #0d6efd;
     color: white;
-    height: 100%;
+    height: calc(48px * 2 + 3px);
 }
 
 /* Ajuste del espacio final de la lista para la nueva altura del teclado */
@@ -352,6 +348,7 @@ input[type="number"] {
        Añadimos un pequeño espacio a la derecha y abajo para que no pegue al borde */
     padding-right: 5px;
     padding-bottom: 5px;
+    height: calc(48px * 2 + 3px);
 }
 
 /* Opcional: Si el botón ENTER también se siente muy pegado al borde */
@@ -366,5 +363,20 @@ input[type="number"] {
 /* Ajuste de seguridad para el área inferior (iPhones y Android nuevos) */
 .numpad-container {
     /* ... otros estilos ... */
-    padding-bottom: calc(env(safe-area-inset-bottom) + 5px); 
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* Importante: box-sizing asegura que el padding no estire el contenedor */
+    box-sizing: border-box; 
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    z-index: 2000;
+    
+    /* Limitamos la altura total del teclado */
+    height: 280px; 
+    overflow: hidden; 
+    
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: transform 0.2s ease-out; 
 }
