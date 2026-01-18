@@ -1998,64 +1998,56 @@ function numpadPress(key) {
             
         case 'ENTER':
             try {
-                // 1. Evaluar la operación
-                if (currentValue.trim() === '') return;
+                if (currentValue.trim() === '') {
+                    closeNumpad();
+                    return;
+                }
                 
-                // Eval simple y seguro
+                // 1. Evaluar la operación
                 const result = Function('"use strict";return (' + currentValue + ')')();
                 
-                // Convertir a número para eliminar ceros a la izquierda residuales y limitar decimales
-                result = parseFloat(Number(result).toFixed(2));
+                // 2. Formatear y asignar (eliminando ceros a la izquierda y limitando decimales)
+                activeMathInput.value = parseFloat(Number(result).toFixed(2));
                 
-                // Formatear (redondear 2 decimales si es necesario)
-                activeMathInput.value = Math.round(result * 100) / 100;
-                
-                // 2. Disparar evento para guardar cambios (como si el usuario hubiera terminado)
-                const event = new Event('change', { bubbles: true });
-                activeMathInput.dispatchEvent(event);
-                
-                // 3. LOGICA NUEVA: Buscar el siguiente input
-                // Obtenemos todos los inputs visibles de la lista
+                // 3. Notificar el cambio para que se guarde en el inventario
+                activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+                // 4. Lógica de SALTO al siguiente input
                 const allInputs = Array.from(document.querySelectorAll('.math-input'));
                 const currentIndex = allInputs.indexOf(activeMathInput);
                 const nextInput = allInputs[currentIndex + 1];
 
                 if (nextInput) {
-                    // Si existe un próximo input, le damos foco
-                    // Esto disparará automáticamente el evento 'focusin' que ya programamos,
-                    // actualizando 'activeMathInput' y haciendo scroll hacia él.
-                    nextInput.focus();
-                    
-                    // Opcional: Si quieres que seleccione el texto del siguiente input 
-                    // para que al escribir se borre lo anterior, descomenta la siguiente línea:
-                    // nextInput.select(); 
+                    // Esperar un instante para que el renderizado no interfiera
+                    setTimeout(() => {
+                        nextInput.focus();
+                        // Opcional: selecciona el texto para sobreescribir rápido
+                        nextInput.select(); 
+                    }, 50);
                 } else {
-                    // Si es el último input de la lista, cerramos el teclado
                     closeNumpad();
                 }
 
             } catch (e) {
-                // Manejo de errores (fórmulas mal escritas)
                 activeMathInput.classList.add('is-invalid');
                 setTimeout(() => activeMathInput.classList.remove('is-invalid'), 1000);
             }
             break;
             
         default:
-            // Lógica inteligente para números y punto decimal
-            if (key === '.') {
-                // Evitar múltiples puntos decimales
-                if (!currentValue.includes('.')) {
-                    activeMathInput.value = currentValue + key;
+            // Si el valor es "0" (y no es un punto), reemplazamos el 0 por el nuevo número
+            if (currentValue === "0" && key !== ".") {
+                activeMathInput.value = key;
+            } 
+            // Si es un punto, validamos que no exista ya uno
+            else if (key === ".") {
+                if (!currentValue.includes(".")) {
+                    activeMathInput.value = currentValue + ".";
                 }
-            } else {
-                // Si es un número:
-                // Si el valor actual es "0" y no hay punto, reemplazamos el "0"
-                if (currentValue === "0") {
-                    activeMathInput.value = key;
-                } else {
-                    activeMathInput.value = currentValue + key;
-                }
+            }
+            // En cualquier otro caso, concatenamos (números u operadores)
+            else {
+                activeMathInput.value = currentValue + key;
             }
             break;
     }

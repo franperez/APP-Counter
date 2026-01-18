@@ -233,18 +233,40 @@ input[type="number"] {
 /* FIN DE NUEVOS ESTILOS */
 /* ============================================ */
 /* ESTILOS DEL TECLADO NUMÉRICO (Versión Compacta -25%) */
+
+:root {
+    /* Ajusta este valor para cambiar la altura de todos los botones a la vez */
+    --numpad-btn-height: 45px; 
+    --numpad-gap: 5px;
+}
+
 .numpad-container {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 1060;
-    /* Mantenemos el safe-area para iPhones, pero reducimos el padding extra */
-    padding-bottom: env(safe-area-inset-bottom);
+    background-color: #f1f3f5;
+    border-top: 1px solid #ced4da;
+    z-index: 2000;
+    box-sizing: border-box;
+    padding: 10px;
+    /* SEPARACIÓN DEL MARCO: Aumentamos el margen inferior para la curvatura */
+    padding-bottom: calc(env(safe-area-inset-bottom) + 40px); 
+    
     transition: transform 0.3s ease-in-out;
+}
+/* Forzamos que el 0 y el punto tengan exactamente la misma altura */
+.numpad-col-nums .btn-num[style*="grid-column: span 3;"], 
+.btn-dot {
+    height: var(--numpad-btn-height) !important;
+    margin-top: 0; /* Evita desplazamientos extra */
+}
+
+/* Alineación de la columna de acciones (Enter y Punto) */
+.numpad-col-actions {
+    display: grid;
+    grid-template-rows: 1fr 1fr; /* Divide el espacio en dos partes iguales */
+    gap: var(--numpad-gap);
 }
 
 .numpad-container.d-none {
@@ -300,12 +322,14 @@ input[type="number"] {
 }
 
 .btn-num {
-  height: 48px; /* Altura fija para que todas las filas midan igual */
+ height: var(--numpad-btn-height) !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    box-sizing: border-box;
+    font-size: 1.2rem;
+    border-radius: 6px;
+    border: 1px solid #adb5bd;
+    touch-action: manipulation;
 }
 
 .btn-num:active {
@@ -332,12 +356,9 @@ input[type="number"] {
 
 /* Ajuste específico para el botón del punto en la esquina */
 .btn-dot {
-    /* Aumentamos un poco el tamaño de la fuente para que el punto sea visible */
-    font-size: 1.5rem !important;
-    /* Añadimos padding extra para alejar el carácter del borde táctil */
-    padding-bottom: 12px !important; 
-    /* Fondo ligeramente distinto para identificarlo rápido (opcional) */
-    background-color: #f1f3f5 !important;
+    font-size: 1.6rem !important;
+    font-weight: bold !important;
+    background-color: #f8f9fa !important;
 }
 
 .numpad-col-actions {
@@ -378,6 +399,6 @@ input[type="number"] {
     height: 280px; 
     overflow: hidden; 
     
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 40px);
     transition: transform 0.2s ease-out;
 }
