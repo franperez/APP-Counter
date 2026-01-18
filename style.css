@@ -322,12 +322,15 @@ input[type="number"] {
 
 /* Ajuste específico para el botón del punto en la esquina */
 .btn-dot {
-    /* Aumentamos un poco el tamaño de la fuente para que el punto sea visible */
-    font-size: 1.5rem !important;
-    /* Añadimos padding extra para alejar el carácter del borde táctil */
-    padding-bottom: 12px !important; 
-    /* Fondo ligeramente distinto para identificarlo rápido (opcional) */
-    background-color: #f1f3f5 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 2rem !important; /* Punto mucho más grande */
+    font-weight: bold !important;
+    color: #000 !important;
+    background-color: #e9ecef !important; /* Color ligeramente distinto para resaltar */
+    line-height: 0 !important;
+    padding-bottom: 15px !important; /* Lo sube un poco para que no lo tape la curva */
 }
 
 .numpad-col-actions {

@@ -2004,6 +2004,9 @@ function numpadPress(key) {
                 // Eval simple y seguro
                 const result = Function('"use strict";return (' + currentValue + ')')();
                 
+                // Convertir a número para eliminar ceros a la izquierda residuales y limitar decimales
+                result = parseFloat(Number(result).toFixed(2));
+                
                 // Formatear (redondear 2 decimales si es necesario)
                 activeMathInput.value = Math.round(result * 100) / 100;
                 
@@ -2039,8 +2042,21 @@ function numpadPress(key) {
             break;
             
         default:
-            // Agregar número u operador
-            activeMathInput.value = currentValue + key;
+            // Lógica inteligente para números y punto decimal
+            if (key === '.') {
+                // Evitar múltiples puntos decimales
+                if (!currentValue.includes('.')) {
+                    activeMathInput.value = currentValue + key;
+                }
+            } else {
+                // Si es un número:
+                // Si el valor actual es "0" y no hay punto, reemplazamos el "0"
+                if (currentValue === "0") {
+                    activeMathInput.value = key;
+                } else {
+                    activeMathInput.value = currentValue + key;
+                }
+            }
             break;
     }
     
