@@ -232,8 +232,7 @@ input[type="number"] {
 /* ============================================ */
 /* FIN DE NUEVOS ESTILOS */
 /* ============================================ */
-
-/* ESTILOS DEL TECLADO NUMÉRICO (Pegar en style.css) */
+/* ESTILOS DEL TECLADO NUMÉRICO (Versión Compacta -25%) */
 .numpad-container {
     position: fixed;
     bottom: 0;
@@ -242,7 +241,8 @@ input[type="number"] {
     background-color: #f8f9fa;
     border-top: 1px solid #dee2e6;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 1060; /* Por encima de modales de bootstrap */
+    z-index: 1060;
+    /* Mantenemos el safe-area para iPhones, pero reducimos el padding extra */
     padding-bottom: env(safe-area-inset-bottom);
     transition: transform 0.3s ease-in-out;
 }
@@ -256,51 +256,58 @@ input[type="number"] {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 10px;
+    /* Reducido: antes 5px 10px */
+    padding: 2px 8px; 
     background-color: #e9ecef;
     border-bottom: 1px solid #dee2e6;
+    height: 35px; /* Altura fija más pequeña para la cabecera */
 }
 
 .btn-close-numpad {
     background: none;
     border: none;
-    font-size: 1.2rem;
-    padding: 5px 15px;
+    font-size: 1rem; /* Reducido */
+    padding: 0 10px;
     color: #6c757d;
 }
 
 .numpad-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-    padding: 5px;
+    /* Reducido: antes gap: 5px */
+    gap: 3px; 
+    /* Reducido: antes padding: 5px */
+    padding: 3px; 
 }
 
 .numpad-row-bottom {
     grid-column: span 4;
     display: grid;
-    grid-template-columns: 3fr 1fr; /* 3 columnas para numeros, 1 para enter */
-    gap: 5px;
+    grid-template-columns: 3fr 1fr;
+    gap: 3px; /* Reducido */
 }
 
 .numpad-col-nums {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
+    gap: 3px; /* Reducido */
 }
 
 .numpad-col-actions {
     display: grid;
-    grid-template-rows: 2fr 1fr; /* Enter alto, punto bajo */
-    gap: 5px;
+    grid-template-rows: 2fr 1fr;
+    gap: 3px; /* Reducido */
 }
 
 .btn-num {
     border: 1px solid #ced4da;
     background-color: white;
-    border-radius: 5px;
-    padding: 15px 0;
-    font-size: 1.25rem;
+    border-radius: 4px; /* Un poco menos redondeado */
+    
+    /* CAMBIOS PRINCIPALES DE TAMAÑO */
+    padding: 8px 0;   /* Antes 15px (Reducción ~45%) */
+    font-size: 1rem;  /* Antes 1.25rem (Reducción ~20%) */
+    
     font-weight: 500;
     touch-action: manipulation;
 }
@@ -321,7 +328,8 @@ input[type="number"] {
     height: 100%;
 }
 
-/* Espacio extra al final de la lista para que el teclado no tape el último item */
+/* Ajuste del espacio final de la lista para la nueva altura del teclado */
 #itemsList {
-    padding-bottom: 350px !important; 
+    /* Reducido de 350px a 260px ya que el teclado es más pequeño */
+    padding-bottom: 260px !important; 
 }

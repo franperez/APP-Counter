@@ -1,4 +1,4 @@
-const CACHE_NAME = 'APP-Counter-cache-v4';
+const CACHE_NAME = 'APP-Counter-cache-v5';
 const urlsToCache = [
     '/APP-Counter/',
     '/APP-Counter/index.html',
