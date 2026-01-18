@@ -333,3 +333,38 @@ input[type="number"] {
     /* Reducido de 350px a 260px ya que el teclado es más pequeño */
     padding-bottom: 260px !important; 
 }
+
+/* Ajuste específico para el botón del punto en la esquina */
+.btn-dot {
+    /* Aumentamos un poco el tamaño de la fuente para que el punto sea visible */
+    font-size: 1.5rem !important;
+    /* Añadimos padding extra para alejar el carácter del borde táctil */
+    padding-bottom: 12px !important; 
+    /* Fondo ligeramente distinto para identificarlo rápido (opcional) */
+    background-color: #f1f3f5 !important;
+}
+
+.numpad-col-actions {
+    display: grid;
+    grid-template-rows: 2fr 1fr;
+    gap: 3px;
+    /* MARGEN DE SEGURIDAD PARA CURVATURA:
+       Añadimos un pequeño espacio a la derecha y abajo para que no pegue al borde */
+    padding-right: 5px;
+    padding-bottom: 5px;
+}
+
+/* Opcional: Si el botón ENTER también se siente muy pegado al borde */
+.btn-num.action-enter {
+    background-color: #0d6efd;
+    color: white;
+    height: 100%;
+    border-radius: 4px;
+    margin-right: 2px; /* Separación de la curva lateral */
+}
+
+/* Ajuste de seguridad para el área inferior (iPhones y Android nuevos) */
+.numpad-container {
+    /* ... otros estilos ... */
+    padding-bottom: calc(env(safe-area-inset-bottom) + 5px); 
+}
