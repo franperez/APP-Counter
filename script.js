@@ -1959,6 +1959,10 @@ document.addEventListener('click', function(e) {
 function openNumpad() {
     const numpad = document.getElementById('custom-numpad');
     numpad.classList.remove('d-none');
+
+    // Evita que la página haga scroll automático indeseado
+    document.body.style.overflow = 'hidden';
+
     // Scroll suave hacia el input para que sea visible
     if(activeMathInput) {
         setTimeout(() => {
@@ -1970,7 +1974,8 @@ function openNumpad() {
 function closeNumpad() {
     const numpad = document.getElementById('custom-numpad');
     numpad.classList.add('d-none');
-    // Quitar foco para que no se quede el cursor parpadeando
+    document.body.style.overflow = 'auto'; // Habilita el scroll de nuevo
+    
     if (activeMathInput) {
         activeMathInput.blur();
         activeMathInput = null;

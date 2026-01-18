@@ -293,14 +293,9 @@ input[type="number"] {
     gap: 3px; /* Reducido */
 }
 
-.numpad-col-actions {
-    display: grid;
-    grid-template-rows: 2fr 1fr;
-    gap: 3px; /* Reducido */
-}
 
 .btn-num {
-   height: 48px; /* Altura fija para que todas las filas midan igual */
+  height: 48px; /* Altura fija para que todas las filas midan igual */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,11 +313,6 @@ input[type="number"] {
     font-weight: bold;
 }
 
-.btn-num.action-enter {
-    background-color: #0d6efd;
-    color: white;
-    height: calc(48px * 2 + 3px);
-}
 
 /* Ajuste del espacio final de la lista para la nueva altura del teclado */
 #itemsList {
@@ -351,18 +341,24 @@ input[type="number"] {
     height: calc(48px * 2 + 3px);
 }
 
+
+
+
 /* Opcional: Si el botón ENTER también se siente muy pegado al borde */
 .btn-num.action-enter {
     background-color: #0d6efd;
     color: white;
-    height: 100%;
+    height: calc(48px * 2 + 3px);
     border-radius: 4px;
     margin-right: 2px; /* Separación de la curva lateral */
 }
 
+
+
 /* Ajuste de seguridad para el área inferior (iPhones y Android nuevos) */
 .numpad-container {
     /* ... otros estilos ... */
+    
     position: fixed;
     bottom: 0;
     left: 0;
@@ -378,5 +374,5 @@ input[type="number"] {
     overflow: hidden; 
     
     padding-bottom: env(safe-area-inset-bottom);
-    transition: transform 0.2s ease-out; 
+    transition: transform 0.2s ease-out;
 }
