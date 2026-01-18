@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Register service worker for PWA
     if ('serviceWorker' in navigator && window.location.protocol !== 'file:'){
-        navigator.serviceWorker.register('/InventarioAPP/service-worker.js')
+        navigator.serviceWorker.register('APP-Counter/service-worker.js')
             .then(registration => console.log('SW registered'))
             .catch(error => console.log('SW registration failed'));
     }
