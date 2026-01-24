@@ -240,21 +240,6 @@ input[type="number"] {
     --numpad-gap: 5px;
 }
 
-.numpad-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #f1f3f5;
-    border-top: 1px solid #ced4da;
-    z-index: 2000;
-    box-sizing: border-box;
-    padding: 10px;
-    /* SEPARACIÓN DEL MARCO: Aumentamos el margen inferior para la curvatura */
-    padding-bottom: calc(env(safe-area-inset-bottom) + 40px); 
-    
-    transition: transform 0.3s ease-in-out;
-}
 /* Forzamos que el 0 y el punto tengan exactamente la misma altura */
 .numpad-col-nums .btn-num[style*="grid-column: span 3;"], 
 .btn-dot {
@@ -399,6 +384,6 @@ input[type="number"] {
     height: 280px; 
     overflow: hidden; 
     
-    padding-bottom: calc(env(safe-area-inset-bottom) + 40px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 280px);
     transition: transform 0.2s ease-out;
 }

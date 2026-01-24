@@ -2035,19 +2035,27 @@ function numpadPress(key) {
             break;
             
         default:
-            // Si el valor es "0" (y no es un punto), reemplazamos el 0 por el nuevo número
-            if (currentValue === "0" && key !== ".") {
-                activeMathInput.value = key;
-            } 
-            // Si es un punto, validamos que no exista ya uno
-            else if (key === ".") {
-                if (!currentValue.includes(".")) {
-                    activeMathInput.value = currentValue + ".";
+            // Obtenemos el valor actual del input
+            let val = activeMathInput.value;
+
+            if (key === '.') {
+                // Dividimos la cadena por los operadores (+, -, *, /) 
+                // para obtener solo los segmentos de números
+                const segments = val.split(/[\+\-\*\/]/);
+                const lastSegment = segments[segments.length - 1];
+
+                // Solo permitimos el punto si el último segmento no tiene uno ya
+                if (!lastSegment.includes('.')) {
+                    activeMathInput.value = val + '.';
                 }
-            }
-            // En cualquier otro caso, concatenamos (números u operadores)
-            else {
-                activeMathInput.value = currentValue + key;
+            } else {
+                // Lógica para números: 
+                // Si el valor es "0" y no estamos escribiendo un operador, lo reemplazamos
+                if (val === "0") {
+                    activeMathInput.value = key;
+                } else {
+                    activeMathInput.value = val + key;
+                }
             }
             break;
     }
