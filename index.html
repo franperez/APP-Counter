@@ -97,15 +97,37 @@
                     <h5 class="modal-title">Importar Archivo CSV</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <input type="file" class="form-control" id="csvFile" accept=".csv">
-                    <div class="form-text">Selecciona un archivo CSV con la estructura: StorageLocation, Item, UofM,
-                        Qty, UofM2, Qty2, UofM3, Qty3</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="importCSV()">Importar</button>
-                </div>
+              <div class="modal-body">
+    <div class="p-3 mb-3 bg-light border rounded">
+        <h6 class="fw-bold text-primary"><i class="bi bi-database-fill"></i> 1. Base de Datos (Maestro)</h6>
+        <p class="small text-muted mb-2">Carga aquí tu archivo CSV con el catálogo de productos.</p>
+        <div class="mb-2">
+            <input type="file" class="form-control form-control-sm" id="csvFile" accept=".csv">
+        </div>
+        <button class="btn btn-primary btn-sm w-100" onclick="importCSV()">
+            <i class="bi bi-upload"></i> Cargar Maestro CSV
+        </button>
+    </div>
+
+    <hr>
+
+    <div class="p-3 bg-light border rounded">
+        <h6 class="fw-bold text-success"><i class="bi bi-folder-fill"></i> 2. Mis Ubicaciones</h6>
+        <p class="small text-muted mb-2">Exporta o importa todas tus pestañas y conteos.</p>
+        
+        <button class="btn btn-outline-success btn-sm w-100 mb-3" onclick="exportLocationsConfig()">
+            <i class="bi bi-download"></i> Exportar Todas mis Ubicaciones
+        </button>
+
+        <label class="form-label small fw-bold mt-2">Restaurar ubicaciones guardadas:</label>
+        <div class="d-flex gap-2">
+            <input type="file" class="form-control form-control-sm" id="locationsFile" accept=".json">
+            <button class="btn btn-success btn-sm" onclick="importLocationsConfig()">
+                <i class="bi bi-arrow-clockwise"></i> Importar
+            </button>
+        </div>
+    </div>
+</div> 
             </div>
         </div>
     </div>

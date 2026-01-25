@@ -2064,3 +2064,81 @@ function numpadPress(key) {
     const inputEvent = new Event('input', { bubbles: true });
     activeMathInput.dispatchEvent(inputEvent);
 }
+
+
+/* ============================================================ */
+/* GESTIÓN DE UBICACIONES (EXPORTAR/IMPORTAR CONJUNTO)          */
+/* ============================================================ */
+
+// 1. EXPORTAR SOLO LAS UBICACIONES (Tu trabajo y configuración)
+function exportLocationsConfig() {
+    // Verificamos si hay ubicaciones creadas
+    if (Object.keys(locations).length === 0) {
+        alert("No hay ubicaciones creadas para exportar.");
+        return;
+    }
+
+    // Preparamos el objeto SOLO con las ubicaciones
+    const locationsData = {
+        type: 'LOCATIONS_BACKUP', // Marca para identificar el archivo
+        timestamp: new Date().toISOString(),
+        data: locations // Aquí va todo tu trabajo (Pestañas, items, cantidades)
+    };
+
+    // Generamos el nombre del archivo con fecha
+    const date = new Date();
+    const dateStr = date.toLocaleDateString('es-ES').replace(/\//g, '-');
+    const fileName = `Mis_Ubicaciones_${dateStr}.json`;
+
+    // Crear y descargar el archivo
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(locationsData));
+    const downloadNode = document.createElement('a');
+    downloadNode.setAttribute("href", dataStr);
+    downloadNode.setAttribute("download", fileName);
+    document.body.appendChild(downloadNode);
+    downloadNode.click();
+    downloadNode.remove();
+}
+
+// 2. IMPORTAR EL CONJUNTO DE UBICACIONES
+function importLocationsConfig() {
+    const fileInput = document.getElementById('locationsFile');
+    
+    if (!fileInput.files.length) {
+        alert("Selecciona el archivo .json de ubicaciones primero.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const jsonContent = JSON.parse(e.target.result);
+
+            // Validamos que sea un archivo de ubicaciones
+            if (!jsonContent.data || jsonContent.type !== 'LOCATIONS_BACKUP') {
+                // Soporte retroactivo por si acaso el formato es viejo
+                if(!jsonContent.Shelf_A && !jsonContent.data) { 
+                    alert("El archivo no parece contener ubicaciones válidas."); 
+                    return; 
+                }
+            }
+
+            const newLocations = jsonContent.data || jsonContent; // Compatibilidad
+
+            if (confirm("Al importar, se REEMPLAZARÁN las ubicaciones actuales con las del archivo.\n\nAsegúrate de haber cargado primero tu MAESTRO (Data Base).\n\n¿Continuar?")) {
+                
+                locations = newLocations;
+                saveData(); // Guardar en memoria del teléfono
+                
+                alert("Ubicaciones restauradas correctamente.");
+                window.location.reload(); // Recargar para ver los cambios
+            }
+
+        } catch (err) {
+            alert("Error al leer el archivo: " + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
