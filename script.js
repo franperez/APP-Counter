@@ -1997,37 +1997,22 @@ function numpadPress(key) {
             break;
             
         case 'ENTER':
+            case 'ENTER':
             try {
-                if (currentValue.trim() === '') {
-                    closeNumpad();
-                    return;
-                }
+                // 1. Resolvemos el cálculo
+                const result = evaluateMath(currentValue);
+                activeMathInput.value = result;
                 
-                // 1. Evaluar la operación
-                const result = Function('"use strict";return (' + currentValue + ')')();
-                
-                // 2. Formatear y asignar (eliminando ceros a la izquierda y limitando decimales)
-                activeMathInput.value = parseFloat(Number(result).toFixed(2));
-                
-                // 3. Notificar el cambio para que se guarde en el inventario
-                activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
-
-                // 4. Lógica de SALTO al siguiente input
-                const allInputs = Array.from(document.querySelectorAll('.math-input'));
-                const currentIndex = allInputs.indexOf(activeMathInput);
-                const nextInput = allInputs[currentIndex + 1];
-
-                if (nextInput) {
-                    // Esperar un instante para que el renderizado no interfiera
-                    setTimeout(() => {
-                        nextInput.focus();
-                        // Opcional: selecciona el texto para sobreescribir rápido
-                        nextInput.select(); 
-                    }, 50);
-                } else {
-                    closeNumpad();
+                // 2. ACTUALIZACIÓN CRÍTICA: Forzamos el guardado manual aquí
+                const itemId = activeMathInput.dataset.itemId;
+                if (currentLocation && itemId) {
+                    locations[currentLocation].data[itemId] = result;
+                    saveData(); // Guardamos inmediatamente antes de mover el foco
                 }
 
+                // 3. Mover al siguiente input
+                focusNextInput(); 
+                
             } catch (e) {
                 activeMathInput.classList.add('is-invalid');
                 setTimeout(() => activeMathInput.classList.remove('is-invalid'), 1000);

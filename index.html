@@ -210,33 +210,33 @@
         <button class="btn-close-numpad" onclick="closeNumpad()"><i class="bi bi-chevron-down"></i></button>
     </div>
     <div class="numpad-grid">
-        <button class="btn-num op" onclick="numpadPress('AC')">AC</button>
-        <button class="btn-num op" onclick="numpadPress('/')">/</button>
-        <button class="btn-num op" onclick="numpadPress('*')">x</button>
-        <button class="btn-num op" onclick="numpadPress('DEL')"><i class="bi bi-backspace"></i></button>
+        <button class="btn-num op" ontouchstart="numpadPress('AC'); event.preventDefault();" onclick="numpadPress('AC')">AC</button>
+        <button class="btn-num op" ontouchstart="numpadPress('/'); event.preventDefault();" onclick="numpadPress('/')">/</button>
+        <button class="btn-num op" ontouchstart="numpadPress('*'); event.preventDefault();" onclick="numpadPress('*')">x</button>
+        <button class="btn-num op" ontouchstart="numpadPress('DEL'); event.preventDefault();" onclick="numpadPress('DEL')"><i class="bi bi-backspace"></i></button>
         
-        <button class="btn-num" onclick="numpadPress('7')">7</button>
-        <button class="btn-num" onclick="numpadPress('8')">8</button>
-        <button class="btn-num" onclick="numpadPress('9')">9</button>
-        <button class="btn-num op" onclick="numpadPress('-')">-</button>
+        <button class="btn-num" ontouchstart="numpadPress('7'); event.preventDefault();" onclick="numpadPress('7')">7</button>
+        <button class="btn-num" ontouchstart="numpadPress('8'); event.preventDefault();" onclick="numpadPress('8')">8</button>
+        <button class="btn-num" ontouchstart="numpadPress('9'); event.preventDefault();" onclick="numpadPress('9')">9</button>
+        <button class="btn-num op" ontouchstart="numpadPress('-'); event.preventDefault();" onclick="numpadPress('-')">-</button>
 
-        <button class="btn-num" onclick="numpadPress('4')">4</button>
-        <button class="btn-num" onclick="numpadPress('5')">5</button>
-        <button class="btn-num" onclick="numpadPress('6')">6</button>
-        <button class="btn-num op" onclick="numpadPress('+')">+</button>
+        <button class="btn-num" ontouchstart="numpadPress('4'); event.preventDefault();" onclick="numpadPress('4')">4</button>
+        <button class="btn-num" ontouchstart="numpadPress('5'); event.preventDefault();" onclick="numpadPress('5')">5</button>
+        <button class="btn-num" ontouchstart="numpadPress('6'); event.preventDefault();" onclick="numpadPress('6')">6</button>
+        <button class="btn-num op" ontouchstart="numpadPress('+'); event.preventDefault();" onclick="numpadPress('+')">+</button>
 
         <div class="numpad-row-bottom">
             <div class="numpad-col-nums">
-                <button class="btn-num" onclick="numpadPress('1')">1</button>
-                <button class="btn-num" onclick="numpadPress('2')">2</button>
-                <button class="btn-num" onclick="numpadPress('3')">3</button>
-                <button class="btn-num w-100" style="grid-column: span 3;" onclick="numpadPress('0')">0</button>
+                <button class="btn-num" ontouchstart="numpadPress('1'); event.preventDefault();" onclick="numpadPress('1')">1</button>
+                <button class="btn-num" ontouchstart="numpadPress('2'); event.preventDefault();" onclick="numpadPress('2')">2</button>
+                <button class="btn-num" ontouchstart="numpadPress('3'); event.preventDefault();" onclick="numpadPress('3')">3</button>
+                <button class="btn-num w-100" ontouchstart="numpadPress('0'); event.preventDefault();" style="grid-column: span 3;" onclick="numpadPress('0')">0</button>
             </div>
             <div class="numpad-col-actions">
-                <button class="btn-num action-enter" onclick="numpadPress('ENTER')">
+                <button class="btn-num action-enter" ontouchstart="numpadPress('ENTER'); event.preventDefault();" onclick="numpadPress('ENTER')">
                     <i class="bi bi-check-lg"></i>
                 </button>
-                <button class="btn-num btn-dot" onclick="numpadPress('.')">.</button>
+                <button class="btn-num btn-dot" ontouchstart="numpadPress('.'); event.preventDefault();" onclick="numpadPress('.')">.</button>
             </div>
         </div>
     </div>
