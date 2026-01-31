@@ -386,6 +386,6 @@ input[type="number"] {
     height: 280px; 
     overflow: hidden; 
     
-    padding-bottom: calc(env(safe-area-inset-bottom) + 280px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 300px);
     transition: transform 0.2s ease-out;
 }
