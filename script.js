@@ -605,27 +605,32 @@ function roundToDecimals(num, decimals = 2) {
 
 // Función para evaluar expresiones matemáticas de forma segura
 function evaluateMathExpression(expression) {
+    // Si está vacío, devolvemos cadena vacía
+    if (!expression) return "";
+    
+    // Convertimos a string por seguridad
+    const strExpr = String(expression).trim();
+    
+    // Si ya es un número simple, lo devolvemos tal cual (convertido a número)
+    if (!isNaN(strExpr)) return parseFloat(strExpr);
+
     try {
-        // Limpiar la expresión: solo permitir números, operadores básicos y puntos decimales
-        const cleanExpression = expression.replace(/[^0-9+\-*/().\s]/g, '');
-        
-        // Verificar que la expresión no esté vacía después de limpiar
-        if (!cleanExpression.trim()) {
-            return NaN;
+        // Validamos que solo tenga números y signos válidos
+        if (/^[0-9+\-*/.\s]+$/.test(strExpr)) {
+            // Evaluamos la operación
+            const result = Function('"use strict";return (' + strExpr + ')')();
+            
+            // Redondeamos a 2 decimales y devolvemos
+            // Usamos Math.round para evitar errores de punto flotante
+            return Math.round(result * 100) / 100;
         }
-        
-        // Evaluar usando Function constructor (más seguro que eval)
-        const result = new Function('return ' + cleanExpression)();
-        
-        // Verificar que el resultado sea un número válido
-        if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
-            return result;
-        } else {
-            return NaN;
-        }
-    } catch (error) {
-        return NaN;
+    } catch (e) {
+        // Si hay error (ej: "5++5" o "3*"), devolvemos lo que escribió el usuario
+        // para que pueda corregirlo visualmente
+        console.warn("Error evaluando expresión:", e);
     }
+    
+    return expression;
 }
 
 function showMathError(itemIndex, field) {
@@ -1981,75 +1986,85 @@ function closeNumpad() {
         activeMathInput = null;
     }
 }
-
+// ==========================================
+// LÓGICA DEL TECLADO (CORREGIDA)
+// ==========================================
+// ==========================================
+// LÓGICA DEL TECLADO (CORREGIDA Y UNIFICADA)
+// ==========================================
 function numpadPress(key) {
     if (!activeMathInput) return;
 
-    let currentValue = activeMathInput.value.toString();
+    let currentValue = activeMathInput.value;
 
     switch (key) {
-        case 'AC':
-            activeMathInput.value = '';
-            break;
-            
-        case 'DEL':
-            activeMathInput.value = currentValue.slice(0, -1);
-            break;
-            
         case 'ENTER':
-            case 'ENTER':
             try {
-                // 1. Resolvemos el cálculo
-                const result = evaluateMath(currentValue);
-                activeMathInput.value = result;
+                // 1. CALCULAR: Usamos la función unificada que ya existe en tu código
+                const result = evaluateMathExpression(currentValue);
                 
-                // 2. ACTUALIZACIÓN CRÍTICA: Forzamos el guardado manual aquí
-                const itemId = activeMathInput.dataset.itemId;
-                if (currentLocation && itemId) {
-                    locations[currentLocation].data[itemId] = result;
-                    saveData(); // Guardamos inmediatamente antes de mover el foco
+                // Actualizamos el valor visualmente
+                activeMathInput.value = result;
+
+                // 2. GUARDAR: Disparamos el evento 'change'
+                // Esto es vital porque tus inputs tienen 'onchange="updateQuantity(...)"'
+                // Al disparar este evento, se ejecuta tu lógica de guardado automáticamente.
+                activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+                // 3. SALTAR AL SIGUIENTE INPUT
+                // Buscamos todos los inputs numéricos visibles en la lista
+                const allInputs = Array.from(document.querySelectorAll('#itemsList input.math-input'));
+                const currentIndex = allInputs.indexOf(activeMathInput);
+
+                if (currentIndex !== -1 && currentIndex < allInputs.length - 1) {
+                    const nextInput = allInputs[currentIndex + 1];
+
+                    // A) Movemos el foco
+                    nextInput.focus();
+                    
+                    // B) Actualizamos la variable global para el teclado
+                    activeMathInput = nextInput;
+                    
+                    // C) Scroll suave para que no quede oculto por el teclado
+                    nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // D) Seleccionamos el texto para que sea fácil sobrescribir
+                    setTimeout(() => nextInput.select(), 50);
+                } else {
+                    // Si es el último, cerramos el teclado y quitamos el foco
+                    closeNumpad();
+                    activeMathInput.blur();
+                    activeMathInput = null;
                 }
 
-                // 3. Mover al siguiente input
-                focusNextInput(); 
-                
             } catch (e) {
+                console.error("Error en Enter:", e);
                 activeMathInput.classList.add('is-invalid');
                 setTimeout(() => activeMathInput.classList.remove('is-invalid'), 1000);
             }
             break;
-            
+
+        case 'DEL':
+            activeMathInput.value = currentValue.slice(0, -1);
+            // Disparamos 'input' para que si tienes validaciones en tiempo real, se enteren
+            activeMathInput.dispatchEvent(new Event('input', { bubbles: true }));
+            break;
+
         default:
-            // Obtenemos el valor actual del input
-            let val = activeMathInput.value;
-
-            if (key === '.') {
-                // Dividimos la cadena por los operadores (+, -, *, /) 
-                // para obtener solo los segmentos de números
-                const segments = val.split(/[\+\-\*\/]/);
-                const lastSegment = segments[segments.length - 1];
-
-                // Solo permitimos el punto si el último segmento no tiene uno ya
-                if (!lastSegment.includes('.')) {
-                    activeMathInput.value = val + '.';
-                }
+            // Lógica para evitar doble punto decimal
+            if (key === '.' && currentValue.includes('.')) return;
+            
+            // Reemplazar el "0" inicial si se escribe un número (excepto si es punto)
+            if (currentValue === "0" && key !== '.') {
+                activeMathInput.value = key;
             } else {
-                // Lógica para números: 
-                // Si el valor es "0" y no estamos escribiendo un operador, lo reemplazamos
-                if (val === "0") {
-                    activeMathInput.value = key;
-                } else {
-                    activeMathInput.value = val + key;
-                }
+                activeMathInput.value = currentValue + key;
             }
+            
+            activeMathInput.dispatchEvent(new Event('input', { bubbles: true }));
             break;
     }
-    
-    // Disparar evento 'input' para actualizaciones en tiempo real si las tienes
-    const inputEvent = new Event('input', { bubbles: true });
-    activeMathInput.dispatchEvent(inputEvent);
 }
-
 
 /* ============================================================ */
 /* GESTIÓN DE UBICACIONES (EXPORTAR/IMPORTAR CONJUNTO)          */
