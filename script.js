@@ -763,7 +763,7 @@ function renderItems(locationName) {
                                     <button class="btn btn-outline-secondary" onclick="event.stopPropagation(); adjustQuantity(${originalIndex}, 'qty', +1)">+1</button>
                                     <button class="btn btn-outline-secondary" onclick="event.stopPropagation(); adjustQuantity(${originalIndex}, 'qty', -1)">-1</button>
                                 </div>
-                                <input type="text" class="form-control form-control-sm math-input" value="${displayQty}" inputmode="none"
+                                <input type="text" class="form-control form-control-sm math-input" data-item-id="${originalIndex}" data-type="qty" value="${displayQty}" inputmode="none"
                                        onchange="event.stopPropagation(); updateQuantity(${originalIndex}, 'qty', this.value)" 
                                        onkeypress="handleMathKeypress(event, ${originalIndex}, 'qty')"
                                        onclick="event.stopPropagation();"
@@ -783,7 +783,7 @@ function renderItems(locationName) {
                                     <button class="btn btn-outline-secondary" onclick="event.stopPropagation(); adjustQuantity(${originalIndex}, 'qty2', +1)">+1</button>
                                     <button class="btn btn-outline-secondary" onclick="event.stopPropagation(); adjustQuantity(${originalIndex}, 'qty2', -1)">-1</button>
                                 </div>
-                                <input type="text" class="form-control form-control-sm math-input" value="${displayQty2}" inputmode="none"
+                                <input type="text" class="form-control form-control-sm math-input" data-item-id="${originalIndex}" data-type="qty2" value="${displayQty2}" inputmode="none"
                                        onchange="event.stopPropagation(); updateQuantity(${originalIndex}, 'qty2', this.value)" 
                                        onkeypress="handleMathKeypress(event, ${originalIndex}, 'qty2')"
                                        onclick="event.stopPropagation();"
@@ -803,7 +803,7 @@ function renderItems(locationName) {
                                     <button class="btn btn-outline-secondary" onclick="event.stopPropagation(); adjustQuantity(${originalIndex}, 'qty3', +1)">+1</button>
                                     <button class="btn btn-outline-secondary" onclick="event.stopPropagation(); adjustQuantity(${originalIndex}, 'qty3', -1)">-1</button>
                                 </div>
-                                <input type="text" class="form-control form-control-sm math-input" value="${displayQty3}" inputmode="none"
+                                <input type="text" class="form-control form-control-sm math-input" data-item-id="${originalIndex}" data-type="qty3" value="${displayQty3}" inputmode="none"
                                        onchange="event.stopPropagation(); updateQuantity(${originalIndex}, 'qty3', this.value)" 
                                        onkeypress="handleMathKeypress(event, ${originalIndex}, 'qty3')"
                                        onclick="event.stopPropagation();"
@@ -1085,7 +1085,7 @@ function adjustQuantity(itemIndex, field, adjustment) {
     // 1. Obtener la ubicación y los datos guardados
     const locationData = locations[currentLocation];
     if (!locationData.quantities) locationData.quantities = {};
-    if (!locationData.quantities[index]) locationData.quantities[index] = {};
+    if (!locationData.quantities[itemIndex]) locationData.quantities[itemIndex] = {};
 
     // 2. Determinar el valor base
     // Intentamos leer el valor actual del input en pantalla si existe, para mayor precisión
@@ -1093,18 +1093,18 @@ function adjustQuantity(itemIndex, field, adjustment) {
     let currentVal = 0;
     
     // Buscamos el input específico en el DOM para ver qué tiene escrito
-    const inputElement = document.querySelector(`input[data-item-id="${index}"][data-type="${field}"]`);
+    const inputElement = document.querySelector(`input[data-item-id="${itemIndex}"][data-type="${field}"]`);
     
     if (inputElement && inputElement.value !== "") {
         // Si hay texto en el input, lo evaluamos primero (por si dice "5+5")
         currentVal = evaluateMathExpression(inputElement.value);
     } else {
         // Si no, usamos lo guardado en memoria
-        currentVal = parseFloat(locationData.quantities[index][field]) || 0;
+        currentVal = parseFloat(locationData.quantities[itemIndex][field]) || 0;
     }
 
     // 3. Realizar la suma/resta
-    let newVal = currentVal + delta;
+    let newVal = currentVal + adjustment;
 
     // 4. Redondeo seguro (para evitar 0.30000000004)
     newVal = Math.round(newVal * 100) / 100;
@@ -1113,7 +1113,7 @@ function adjustQuantity(itemIndex, field, adjustment) {
     if (newVal < 0) newVal = 0;
 
     // 6. Guardar en memoria
-    locationData.quantities[index][field] = newVal;
+    locationData.quantities[itemIndex][field] = newVal;
     saveData(); // Guardar en LocalStorage
 
     // 7. Actualizar el Input en pantalla visualmente
@@ -2003,25 +2003,33 @@ function openNumpad() {
 }
 
 function closeNumpad() {
-    // PASO CRÍTICO: Si hay un input activo y tiene datos, forzamos el guardado
-    // antes de cerrar el teclado.
-    if (activeMathInput) {
-        // Disparamos el evento 'change' para que se ejecute updateQuantity
-        activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
-        
-        // Quitamos la clase de foco visual
-        activeMathInput.classList.remove('active-input'); // Si usas alguna clase visual
+    console.log("Intentando cerrar teclado..."); // Para debug en consola
+
+    // 1. Intentar guardar sin que bloquee el cierre
+    try {
+        if (activeMathInput) {
+            // Evaluamos la expresión final antes de cerrar
+            activeMathInput.value = evaluateMathExpression(activeMathInput.value);
+            
+            // Disparamos el guardado
+            activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
+            activeMathInput.blur();
+        }
+    } catch (e) {
+        console.error("Error al guardar antes de cerrar:", e);
     }
 
-    const numpad = document.getElementById('numpad');
+    // 2. FORZAR CIERRE VISUAL
+    const numpad = document.getElementById('custom-numpad');
     if (numpad) {
-        numpad.classList.remove('show');
-    }
-    
-    // Dejamos de rastrear el input activo
+    numpad.classList.add('d-none'); // Oculta el teclado
+    console.log("Teclado ocultado correctamente");
+}
+// Además se añadió:
+    document.body.style.overflow = ''; // Restaura el scroll
+
+    // 3. Limpiar variables y estilos
     activeMathInput = null;
-    
-    // Restauramos el padding del body
     document.body.style.paddingBottom = '0';
 }
 // ==========================================
@@ -2036,7 +2044,7 @@ function numpadPress(key) {
     let currentValue = activeMathInput.value;
 
     switch (key) {
-        case 'CA': // <--- AGREGADO NUEVO
+        case 'AC': // <--- AGREGADO NUEVO
             // Limpiamos el valor visual
             activeMathInput.value = '';
             // Disparamos 'input' para limpiar validaciones visuales si las hubiera
