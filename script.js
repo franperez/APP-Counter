@@ -1080,23 +1080,49 @@ function updateQuantity(itemIndex, field, value) {
 
 // Adjust quantity with buttons con redondeo
 function adjustQuantity(itemIndex, field, adjustment) {
-    if (currentLocation) {
-        if (!locations[currentLocation].quantities[itemIndex]) {
-            locations[currentLocation].quantities[itemIndex] = {};
-        }
+   if (!currentLocation || !locations[currentLocation]) return;
+
+    // 1. Obtener la ubicación y los datos guardados
+    const locationData = locations[currentLocation];
+    if (!locationData.quantities) locationData.quantities = {};
+    if (!locationData.quantities[index]) locationData.quantities[index] = {};
+
+    // 2. Determinar el valor base
+    // Intentamos leer el valor actual del input en pantalla si existe, para mayor precisión
+    // Si no, leemos de la memoria.
+    let currentVal = 0;
+    
+    // Buscamos el input específico en el DOM para ver qué tiene escrito
+    const inputElement = document.querySelector(`input[data-item-id="${index}"][data-type="${field}"]`);
+    
+    if (inputElement && inputElement.value !== "") {
+        // Si hay texto en el input, lo evaluamos primero (por si dice "5+5")
+        currentVal = evaluateMathExpression(inputElement.value);
+    } else {
+        // Si no, usamos lo guardado en memoria
+        currentVal = parseFloat(locationData.quantities[index][field]) || 0;
+    }
+
+    // 3. Realizar la suma/resta
+    let newVal = currentVal + delta;
+
+    // 4. Redondeo seguro (para evitar 0.30000000004)
+    newVal = Math.round(newVal * 100) / 100;
+
+    // 5. Validar que no sea negativo (Opcional: borra esto si permites negativos)
+    if (newVal < 0) newVal = 0;
+
+    // 6. Guardar en memoria
+    locationData.quantities[index][field] = newVal;
+    saveData(); // Guardar en LocalStorage
+
+    // 7. Actualizar el Input en pantalla visualmente
+    if (inputElement) {
+        inputElement.value = newVal;
         
-        const currentValue = locations[currentLocation].quantities[itemIndex][field] || 0;
-        const newValue = Math.max(0, currentValue + adjustment);
-        const roundedValue = roundToDecimals(newValue, 2);
-        locations[currentLocation].quantities[itemIndex][field] = roundedValue;
-        
-        // Update the input field
-        const input = document.querySelector(`[data-index="${itemIndex}"] input[onchange*="${field}"]`);
-        if (input) {
-            input.value = roundedValue;
-        }
-        
-        saveData();
+        // Efecto visual de parpadeo suave para confirmar la acción
+        inputElement.style.backgroundColor = '#e8f0fe';
+        setTimeout(() => inputElement.style.backgroundColor = '', 200);
     }
 }
 
@@ -1977,14 +2003,26 @@ function openNumpad() {
 }
 
 function closeNumpad() {
-    const numpad = document.getElementById('custom-numpad');
-    numpad.classList.add('d-none');
-    document.body.style.overflow = 'auto'; // Habilita el scroll de nuevo
-    
+    // PASO CRÍTICO: Si hay un input activo y tiene datos, forzamos el guardado
+    // antes de cerrar el teclado.
     if (activeMathInput) {
-        activeMathInput.blur();
-        activeMathInput = null;
+        // Disparamos el evento 'change' para que se ejecute updateQuantity
+        activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Quitamos la clase de foco visual
+        activeMathInput.classList.remove('active-input'); // Si usas alguna clase visual
     }
+
+    const numpad = document.getElementById('numpad');
+    if (numpad) {
+        numpad.classList.remove('show');
+    }
+    
+    // Dejamos de rastrear el input activo
+    activeMathInput = null;
+    
+    // Restauramos el padding del body
+    document.body.style.paddingBottom = '0';
 }
 // ==========================================
 // LÓGICA DEL TECLADO (CORREGIDA)
@@ -1998,6 +2036,15 @@ function numpadPress(key) {
     let currentValue = activeMathInput.value;
 
     switch (key) {
+        case 'CA': // <--- AGREGADO NUEVO
+            // Limpiamos el valor visual
+            activeMathInput.value = '';
+            // Disparamos 'input' para limpiar validaciones visuales si las hubiera
+            activeMathInput.dispatchEvent(new Event('input', { bubbles: true }));
+            // Disparamos 'change' para que se guarde el valor vacío (0) en la base de datos inmediatamente
+            activeMathInput.dispatchEvent(new Event('change', { bubbles: true }));
+            break;
+
         case 'ENTER':
             try {
                 // 1. CALCULAR: Usamos la función unificada que ya existe en tu código
